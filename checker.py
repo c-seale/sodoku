@@ -16,6 +16,19 @@ xxx...|||xxx...|||xxx...|||
 """
 
 
+"""
+004300209
+005009001
+070060043
+006002087
+190007400
+050083000
+600000105
+003508690
+042910300
+"""
+
+
 def check_solution(board_state: str) -> bool:
     """
     Check to see if a sudoku board state string is a valid solution

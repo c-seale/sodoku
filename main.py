@@ -27,7 +27,7 @@ def main():
     surface.fill(BACKGROUND_COLOR)
     pygame.display.update()
 
-    board = Board(surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+    board = Board(surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, load_level(1)[0].rstrip())
 
     # Init music
     # TODO: Setup background music
@@ -49,8 +49,8 @@ def main():
         sever_tick.tick(FRAMERATE_LIMIT)
 
 
-def load_level(level: int) -> str:
-    with open(r'data\levels\1', 'r') as f:
+def load_level(level: int):
+    with open(r'data\level\1', 'r') as f:
         puzzle = f.readline()
         solution = f.readline()
     return puzzle, solution
