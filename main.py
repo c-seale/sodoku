@@ -4,10 +4,10 @@ import pygame
 
 from object.board import Board
 
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 768
+SCREEN_WIDTH = 792
+SCREEN_HEIGHT = 892
 
-BACKGROUND_COLOR = pygame.Color('WHITE')
+BACKGROUND_COLOR = pygame.Color('BLACK')
 
 FRAMERATE_LIMIT = 60
 
@@ -27,7 +27,8 @@ def main():
     display.fill(BACKGROUND_COLOR)
     pygame.display.update()
 
-    board = Board(display, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, load_level(1)[0].rstrip())
+    board_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT - 100))
+    board = Board(board_surface, load_level(1)[0].rstrip())
 
     # Init music
     # TODO: Setup background music
@@ -39,8 +40,9 @@ def main():
 
         # Handle events
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and (
-                    pressed_keys[pygame.K_LALT] or pressed_keys[pygame.K_RALT])):
+            if event.type == pygame.QUIT \
+                    or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4
+                        and (pressed_keys[pygame.K_LALT] or pressed_keys[pygame.K_RALT])):
                 running = False
                 break
             if event.type == pygame.KEYUP:
@@ -71,6 +73,9 @@ def main():
                 board.set_active_cell(pygame.mouse.get_pos())
 
         board.update()
+        display.blit(board_surface, (0, 0))
+
+        pygame.display.update()
 
         sever_tick.tick(FRAMERATE_LIMIT)
 

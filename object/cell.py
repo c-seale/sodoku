@@ -2,16 +2,12 @@ import pygame
 
 
 class Cell:
-    CELL_BORDER_SIZE = 2
+    CELL_BORDER_SIZE = 1
     CELL_BORDER_COLOR = pygame.Color('BLACK')
     CELL_SELECTED_BORDER_COLOR = pygame.Color('RED')
 
     def __init__(self, surface: pygame.Surface, x: int, y: int, width: int, height: int, initial_val: int, bg_color):
-        self.surface = surface
-        self._x = x
-        self._y = y
-        self._width = width
-        self._height = height
+        self._surface = surface
         self._bg_color = bg_color
 
         self._value = int(initial_val)
@@ -26,7 +22,15 @@ class Cell:
             self._is_editable = True
             self._value_color = pygame.Color('WHITE')
 
-        self.rect = pygame.Rect(self._x, self._y, self._width, self._height)
+        self.rect = pygame.Rect(x, y, width, height)
+
+    @property
+    def bg_color(self):
+        if self.is_selected:
+            shaded = (int(self._bg_color.r * 0.75), int(self._bg_color.g * 0.75),
+                      int(self._bg_color.b * 0.75), int(self._bg_color.a * 0.75))
+            return pygame.Color(*shaded)
+        return self._bg_color
 
     @property
     def is_editable(self):
@@ -52,18 +56,13 @@ class Cell:
         self._is_selected = False
 
     def draw(self):
-        if self.is_selected:
-            border_color = self.CELL_SELECTED_BORDER_COLOR
-        else:
-            border_color = self.CELL_BORDER_COLOR
-
-        pygame.draw.rect(self.surface, self._bg_color, self.rect)
-        self.rect = pygame.draw.rect(self.surface, border_color, self.rect, self.CELL_BORDER_SIZE)
+        pygame.draw.rect(self._surface, self.bg_color, self.rect)  # cell background color
+        pygame.draw.rect(self._surface, self.CELL_BORDER_COLOR, self.rect, self.CELL_BORDER_SIZE)  # draw outline
 
         if self.value and self.value > 0:
-            font = pygame.font.SysFont(pygame.font.get_default_font(), 90)
+            font = pygame.font.SysFont(pygame.font.get_default_font(), 60)
             rendered_font = font.render('{}'.format(self.value), True, self._value_color)
-            self.surface.blit(rendered_font, rendered_font.get_rect(center=self.rect.center))
+            self._surface.blit(rendered_font, rendered_font.get_rect(center=self.rect.center))
 
     def update(self):
         self.draw()
