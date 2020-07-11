@@ -2,7 +2,9 @@ import os
 
 import pygame
 
-from object.board import Board
+from app.menu import Menu
+from app.object.board import Board
+from app.validator import check_solution
 
 SCREEN_WIDTH = 792
 SCREEN_HEIGHT = 892
@@ -29,6 +31,9 @@ def main():
 
     board_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT - 100))
     board = Board(board_surface, load_level(1)[0].rstrip())
+
+    menu_surface = pygame.Surface((SCREEN_WIDTH, 100))
+    menu = Menu(menu_surface)
 
     # Init music
     # TODO: Setup background music
@@ -65,23 +70,37 @@ def main():
                     cell_val_input = 8
                 if event.key in [pygame.K_9, pygame.K_KP9]:
                     cell_val_input = 9
-                if event.key in [pygame.K_DELETE, pygame.K_0, pygame.K_KP0]:
+                if event.key in [pygame.K_BACKSPACE, pygame.K_DELETE, pygame.K_0, pygame.K_KP0]:
                     cell_val_input = 0
                 if cell_val_input is not None:
-                    board.update_active_cell(cell_val_input)
+                    board.update_selected_cell(cell_val_input)
             if event.type == pygame.MOUSEBUTTONUP:
-                board.set_active_cell(pygame.mouse.get_pos())
+                # TODO: Clicking seems weird -- colliderect is true no matter where on screen you click.
+                #       However, it's currently working well enough. Should investigate this behavior in the future
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_rect = pygame.Rect(mouse_pos, (1, 1))
+                if board.rect.colliderect(mouse_rect):
+                    board.click(mouse_pos)
+                if menu.rect.colliderect(menu.rect):
+                    menu_option = menu.click((mouse_pos[0], SCREEN_HEIGHT - mouse_pos[1]))
+                    if menu_option == menu.BTN_CHECK_SOLUTION:
+                        if check_solution(board.board_state):
+                            print('Solved!')  # TODO: Some kind of victory screen that leads to next level?
+                        else:
+                            print('Try Harder')
 
         board.update()
         display.blit(board_surface, (0, 0))
 
-        pygame.display.update()
+        menu.update()
+        display.blit(menu_surface, (0, SCREEN_HEIGHT - 100))
 
+        pygame.display.update()
         sever_tick.tick(FRAMERATE_LIMIT)
 
 
 def load_level(level: int):
-    with open(r'data\level\1', 'r') as f:
+    with open(r'data/level/1', 'r') as f:
         puzzle = f.readline()
         solution = f.readline()
     return puzzle, solution
